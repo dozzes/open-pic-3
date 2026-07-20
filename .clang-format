@@ -1,0 +1,96 @@
+---
+Language: Cpp
+BasedOnStyle: LLVM
+
+# --- Indentation ---
+IndentWidth:              4
+TabWidth:                 4
+UseTab:                   Never
+ContinuationIndentWidth:  4
+IndentCaseLabels:         true
+IndentPPDirectives:       None
+NamespaceIndentation:     None
+
+# --- Line length ---
+ColumnLimit: 120
+
+# --- Brace style: Allman for functions/classes/structs,
+#     same-line for control flow (if/for/while) ---
+BreakBeforeBraces: Custom
+BraceWrapping:
+  AfterClass:            true
+  AfterStruct:           true
+  AfterUnion:            true
+  AfterEnum:             false
+  AfterFunction:         true
+  AfterNamespace:        false
+  AfterControlStatement: Never
+  BeforeCatch:           false
+  BeforeElse:            false
+  IndentBraces:          false
+  SplitEmptyFunction:    false
+  SplitEmptyRecord:      false
+  SplitEmptyNamespace:   false
+
+# --- Pointers and references flush left: Grid& grid, const Particle* p ---
+PointerAlignment:         Left
+ReferenceAlignment:       Left
+
+# --- Column alignment for consecutive declarations and assignments ---
+# Preserves the readable vertical alignment seen throughout the codebase.
+AlignConsecutiveDeclarations:
+  Enabled:          true
+  AcrossEmptyLines: false
+  AcrossComments:   false
+AlignConsecutiveAssignments:
+  Enabled:          true
+  AcrossEmptyLines: false
+  AcrossComments:   false
+AlignConsecutiveMacros:
+  Enabled:          true
+  AcrossEmptyLines: false
+  AcrossComments:   false
+
+# --- Trailing comments ---
+AlignTrailingComments:
+  Kind:           Always
+  OverEmptyLines: 1
+
+# --- Include ordering ---
+# Keep existing order: project headers first, then system headers.
+# Do not let clang-format reorder or merge include blocks.
+SortIncludes:         Never
+IncludeBlocks:        Preserve
+
+# --- Short constructs ---
+AllowShortFunctionsOnASingleLine:   Inline
+AllowShortLambdasOnASingleLine:     Inline
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine:       false
+AllowShortBlocksOnASingleLine:      Empty
+
+# --- Spaces ---
+SpaceBeforeParens:          ControlStatements
+SpaceInEmptyParentheses:    false
+SpacesInAngles:             Never
+SpacesInParentheses:        false
+SpacesInSquareBrackets:     false
+SpaceAfterTemplateKeyword:  true
+
+# --- Breaking long lines ---
+BreakBeforeBinaryOperators:    NonAssignment
+BreakBeforeTernaryOperators:   true
+BreakConstructorInitializers:  BeforeComma
+PackConstructorInitializers:   Never
+BreakStringLiterals:           false
+
+# --- Template and function argument alignment ---
+AlignAfterOpenBracket:  Align
+BinPackArguments:       false
+BinPackParameters:      false
+
+# --- Penalties (tune to match existing wrapping preferences) ---
+PenaltyBreakBeforeFirstCallParameter: 100
+PenaltyBreakComment:                  200
+PenaltyExcessCharacter:               10
+PenaltyReturnTypeOnItsOwnLine:        200

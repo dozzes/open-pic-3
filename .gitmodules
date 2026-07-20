@@ -1,0 +1,6 @@
+[submodule "docs/research"]
+	path = docs/research
+	url = https://github.com/dozzes/openpic-docs.git
+[submodule "sim/tasks/examples"]
+	path = sim/tasks/examples
+	url = https://github.com/dozzes/openpic-examples.git

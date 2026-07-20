@@ -1,0 +1,35 @@
+/build
+/build-mpi
+/build-tests
+/.claude
+
+# Simulation outputs -- never commit these
+*.zip
+*.dat
+*.exe
+*.log
+energy.txt
+energy_kin.txt
+test_params.txt
+lua_params.txt
+opic_config.txt
+opic_trace.log
+diag/
+
+# MPI validation run directories (created by mpi_check scripts)
+MPI_CHECK_*/
+VV_*/
+*_MPI_CHECK/
+MPI_N*/
+MPI_SERIAL_*/
+_MPI_RUNS_*/
+
+# Old task directory copies in repo root
+1_THERMAL-*/
+2_GOOD-NOTHERM_*/
+
+# Misc scratch files
+lst
+
+# Cached downloads (MPI installers, etc.)
+tools/.cache/

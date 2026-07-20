@@ -1,0 +1,36 @@
+package.path = package.path .. ";../lib/?.lua;../../../lib/?.lua"
+
+local verify = require("verification_common")
+
+local nodes = 33
+local h = 1.0
+local B0 = 100.0
+local n0 = 1.0e15
+local mi = require("cgs").mp
+local amp = 1.0e-6
+local Lz = (nodes - 1) * h
+local k = 2.0 * math.pi / Lz
+local vA = B0 / math.sqrt(4.0 * math.pi * n0 * mi)
+
+verify.run({
+    case_name = "LINEAR_ALFVEN",
+    nodes = nodes,
+    h = h,
+    Bz0 = B0,
+    backgr_dens = n0,
+    backgr_mi = mi,
+    time_steps = 8,
+    save_time_steps = 1,
+    save_whole_grid = true,
+
+    velocity_fn = function(x, y, z)
+        local dvx = amp * vA * math.sin(k * z)
+        return DblVector(dvx, 0.0, 0.0)
+    end,
+
+    field_fn = function(cell, x, y, z)
+        local dB = amp * B0 * math.sin(k * z)
+        cell.B.x = dB
+        cell.B.z = B0
+    end,
+})
