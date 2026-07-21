@@ -421,21 +421,8 @@ tools/                Setup scripts and diagnostic utilities
 
 ## Citation
 
-If you use OpenPIC in published research, please cite the relevant OpenPIC publication or software release.
-
-```bibtex
-@software{openpic,
-  author  = {David Osipyan and contributors},
-  title   = {OpenPIC: A 3D Hybrid Particle-in-Cell Plasma Simulation Framework},
-  year    = {YEAR},
-  url     = {https://github.com/dozzes/open-pic-3},
-  version = {VERSION}
-}
-```
-
-Replace `YEAR` and `VERSION` with the appropriate release information.
-
-For better integration with GitHub, Zenodo, and reference-management tools, add a `CITATION.cff` file to the repository.
+> **3D modeling of the plasma expansion in a dipole magnetic field.**  
+> *Proceedings of the XXX International Conference on Phenomena in Ionized Gases (ICPIG 2011)*, Belfast, Northern Ireland, UK, August 2011.
 
 ## Authors and Acknowledgments
 
@@ -444,8 +431,6 @@ OpenPIC was developed at the Institute of Radiophysics and Electronics of the Na
 Lead developer:
 
 * David Osipyan
-
-Add other project contributors, scientific collaborators, funding sources, institutions, and acknowledgments here as appropriate.
 
 ## License
 
