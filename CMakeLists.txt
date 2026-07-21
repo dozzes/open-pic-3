@@ -22,7 +22,7 @@ option(OPENPIC_PARTICLE_STATIC_SCHEDULE "Use OpenMP static schedule in move_part
 # 3. DEFINE THE EXECUTABLE
 # Explicit source list (no GLOB): a new file that is not registered here must
 # fail the build loudly instead of being silently compiled against a stale
-# CMake cache ("собралось старое").
+# CMake cache.
 set(SOURCES
     src/config/config.cpp
     src/core/check_particle.cpp

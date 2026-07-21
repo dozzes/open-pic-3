@@ -30,6 +30,11 @@ add_library(liblua STATIC ${CORE_C} ${LIB_C})
 # Define the include directory so sol2 can find lua.h
 target_include_directories(liblua PUBLIC ${LUA_SRC_DIR})
 
+# lmathlib.c and others need libm's floor/pow/sin/etc on Unix-like systems
+if(UNIX)
+    target_link_libraries(liblua PUBLIC m)
+endif()
+
 # 4. OPTIONAL: CREATE STANDALONE EXECUTABLES
 # Only build these if you want the lua.exe interpreter
 add_executable(lua_shell ${LUA_SRC_DIR}/lua.c)

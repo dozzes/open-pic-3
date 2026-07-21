@@ -27,7 +27,7 @@ template <typename Ret, typename... Args> Ret Call(sol::state_view lua, const st
     if constexpr (std::is_void_v<Ret>) {
         return;
     } else {
-        return result.get<Ret>();
+        return result.template get<Ret>();
     }
 }
 } // namespace ScriptBridge

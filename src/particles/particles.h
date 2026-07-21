@@ -7,6 +7,7 @@
 #include "grid/vector_3d.h"
 #include "util/aligned_alloc.h"
 
+#include <cstdint>
 #include <iosfwd>
 #include <string>
 #include <deque>
