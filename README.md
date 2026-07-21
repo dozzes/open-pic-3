@@ -10,23 +10,28 @@ OpenPIC has been tested on Windows 11 and Ubuntu 26.04 LTS.
 
 OpenPIC is research-oriented scientific software intended for plasma simulation, numerical experimentation, verification studies, and reproducible computational research.
 
-The Windows build using MSVC 2022 is the primary verified configuration, with MPI support through Microsoft MPI. The Ubuntu build (GCC, OpenMPI) also works — see [Quick Start (Ubuntu)](#quick-start-ubuntu) — but has not been verified as thoroughly as Windows.
+The Windows build using MSVC 2022 is the primary verified configuration, with MPI support through Microsoft MPI.
+The Ubuntu build (GCC, OpenMPI) also works — see [Quick Start (Ubuntu)](#quick-start-ubuntulinux) — but has not been verified as thoroughly as Windows.
 
 ## Quick Start
 
-The commands below are for Windows and should be run from a **Developer Command Prompt for Visual Studio 2022**. For Ubuntu/Linux, see [Quick Start (Ubuntu)](#quick-start-ubuntu) below.
+The instructions below cover Windows and Ubuntu/Linux.
+
+## Quick Start (Windows)
+
+Run these commands from a **Developer Command Prompt for Visual Studio 2022**.
 
 ### 1. Clone the Repository
 
-```text
+```bat
 git clone https://github.com/dozzes/open-pic-3.git
 cd open-pic-3
 ```
 
 ### 2. Build in Release Mode
 
-```text
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+```bat
+cmake -S . -B build
 cmake --build build --config Release -j
 ```
 
@@ -38,17 +43,17 @@ build\bin\Release\open-pic.exe
 
 ### 3. Run a Verification Case
 
-```text
+Run the following command from the repository root:
+
+```bat
 build\bin\Release\open-pic.exe sim\tasks\04_VERIFICATION\UNIFORM_EQUILIBRIUM\main.lua
 ```
 
-Diagnostic files are written to the `diag/` directory inside the simulation run directory.
+Diagnostic files are written to the `diag/` directory inside the simulation case directory.
 
-For MPI builds, Linux notes, configuration options, and additional run modes, see the sections below.
+## Quick Start (Ubuntu/Linux)
 
-## Quick Start (Ubuntu)
-
-### 1. Install Build Tools
+### 1. Install the Build Tools
 
 ```bash
 sudo apt update
@@ -66,7 +71,7 @@ cd open-pic-3
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release -j
+cmake --build build -j
 ```
 
 The executable is generated at:
@@ -77,30 +82,70 @@ build/bin/open-pic
 
 ### 4. Run a Verification Case
 
-Run with the path relative to the repository root:
+Run the following command from the repository root:
 
 ```bash
 ./build/bin/open-pic sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM/main.lua
 ```
 
-Or `cd` into the case directory and pass just the file name (the Lua path is
-relative to the current directory, not the repo root):
+Alternatively, change to the simulation case directory and pass only the Lua file name:
 
 ```bash
 cd sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM
 ~/open-pic-3/build/bin/open-pic main.lua
 ```
 
-For an MPI-enabled build, install OpenMPI and reconfigure with
-`-DOPENPIC_ENABLE_MPI=ON`:
+The Lua file path is resolved relative to the current working directory, not the repository root.
+
+## Build with MPI Support
+
+### Windows
+
+Install Microsoft MPI:
+
+```bat
+powershell -ExecutionPolicy Bypass -File tools\setup_msmpi.ps1
+```
+
+Configure and build:
+
+```bat
+cmake -S . -B build-mpi -DOPENPIC_ENABLE_MPI=ON
+cmake --build build-mpi --config Release -j
+```
+
+The executable is generated at:
+
+```text
+build-mpi\bin\Release\open-pic_mpi.exe
+```
+
+### Ubuntu/Linux
+
+Install OpenMPI:
 
 ```bash
 sudo apt install -y libopenmpi-dev openmpi-bin
-cmake -S . -B build -DOPENPIC_ENABLE_MPI=ON
-cmake --build build --config Release -j
 ```
 
-See [Linux Build](docs/OpenPIC_User_Guide.md#linux-ubuntu-build) in the User Guide for details.
+Configure and build:
+
+```bash
+cmake -S . -B build-mpi \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DOPENPIC_ENABLE_MPI=ON
+
+cmake --build build-mpi -j
+```
+
+The executable is generated at:
+
+```text
+build-mpi/bin/open-pic_mpi
+```
+
+For MPI execution options and recommended OpenMP settings, see
+[Running with MPI](docs/OpenPIC_User_Guide.md#running-with-mpi) in the User Guide.
 
 ## Key Features
 
@@ -167,7 +212,6 @@ cd open-pic-3
 ### Requirements
 
 * CMake 3.13 or later
-* C++17-compatible compiler
 
 Windows:
 
@@ -179,14 +223,14 @@ Ubuntu/Linux:
 
 * `build-essential` and `cmake` (`sudo apt install -y build-essential cmake`)
 * `libopenmpi-dev` and `openmpi-bin` for MPI-enabled builds
-* Run all commands from a regular terminal; see [Quick Start (Ubuntu)](#quick-start-ubuntu) for the full sequence
+* Run all commands from a regular terminal; see [Quick Start (Ubuntu)](#quick-start-ubuntulinux) for the full sequence
 
 ### Standard Build
 
 Windows:
 
-```text
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+```bat
+cmake -S . -B build
 cmake --build build --config Release -j
 ```
 
@@ -202,7 +246,7 @@ Ubuntu/Linux:
 sudo apt update
 sudo apt install -y build-essential cmake
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release -j
+cmake --build build -j
 ```
 
 The executable is generated at:
@@ -213,26 +257,54 @@ build/bin/open-pic
 
 ### Build with MPI Support
 
-Windows — install Microsoft MPI first:
+### Windows
 
-```text
+Install Microsoft MPI:
+
+```bat
 powershell -ExecutionPolicy Bypass -File tools\setup_msmpi.ps1
 ```
 
-Ubuntu/Linux — install OpenMPI first:
+Configure and build OpenPIC with MPI enabled:
+
+```bat
+cmake -S . -B build-mpi -DOPENPIC_ENABLE_MPI=ON
+cmake --build build-mpi --config Release -j
+```
+
+The executable is generated at:
+
+```text
+build-mpi\bin\Release\open-pic_mpi.exe
+```
+
+### Ubuntu/Linux
+
+Install OpenMPI:
 
 ```bash
 sudo apt install -y libopenmpi-dev openmpi-bin
 ```
 
-Configure and build OpenPIC with MPI enabled (same command on both platforms):
+Configure and build OpenPIC with MPI enabled:
 
-```text
-cmake -S . -B build -DOPENPIC_ENABLE_MPI=ON
-cmake --build build --config Release -j
+```bash
+cmake -S . -B build-mpi \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DOPENPIC_ENABLE_MPI=ON
+
+cmake --build build-mpi -j
 ```
 
-See [docs/OpenPIC_User_Guide.md](docs/OpenPIC_User_Guide.md) for complete build instructions and troubleshooting information.
+The executable is generated at:
+
+```text
+build-mpi/bin/open-pic_mpi
+```
+
+For MPI execution options and recommended OpenMP settings, see
+[Running with MPI](docs/OpenPIC_User_Guide.md#running-with-mpi) in the User Guide.
+
 
 ## Run
 
@@ -259,15 +331,15 @@ The following example starts four MPI ranks with four OpenMP threads per rank.
 
 Windows:
 
-```text
+```bat
 set OMP_NUM_THREADS=4
-mpiexec -n 4 build\bin\Release\open-pic.exe -mpi sim\tasks\04_VERIFICATION\UNIFORM_EQUILIBRIUM\main.lua
+mpiexec -n 4 build-mpi\bin\Release\open-pic_mpi.exe -mpi sim\tasks\04_VERIFICATION\UNIFORM_EQUILIBRIUM\main.lua
 ```
 
 Ubuntu/Linux:
 
 ```bash
-OMP_NUM_THREADS=4 mpiexec -n 4 build/bin/open-pic -mpi sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM/main.lua
+OMP_NUM_THREADS=4 mpiexec -n 4 ./build-mpi/bin/open-pic_mpi -mpi sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM/main.lua
 ```
 
 A successful run creates diagnostic output under the simulation run directory.

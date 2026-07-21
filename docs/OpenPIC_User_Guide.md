@@ -10,7 +10,7 @@ The code is driven by Lua input files. A typical simulation directory contains t
 
 ## 2. Getting the Code
 
-To checkout the OpenPIC source, do the following:
+To check out the OpenPIC source, do the following:
 
 ```text
 git clone https://github.com/dozzes/open-pic-3.git
@@ -49,7 +49,7 @@ Configure and build from the top-level source directory:
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release -j
+cmake --build build -j
 ```
 
 The Release executable is produced at:
@@ -96,11 +96,20 @@ Release build shown above (no extra `-D` flags) is the production build:
 | `OPENPIC_PARTICLE_STATIC_SCHEDULE` | `OFF` | Replaces the particle half-step OpenMP loop schedule with `schedule(static)` for scaling experiments. | Can change performance characteristics. Treat as experimental until validated for production workloads. |
 | `OPENPIC_NATIVE_ARCH` | `ON` | GCC/Clang builds only (no effect on MSVC, which always builds with `/arch:AVX2`): adds `-march=native`. | Maximizes throughput but makes the binary's numerical results machine-dependent. Disable for verification/validation runs that must reproduce bit-for-bit across hosts. |
 
-MPI build (same command on Windows and Linux):
+MPI build on Windows:
 
 ```text
 cmake -S . -B build-mpi -DOPENPIC_ENABLE_MPI=ON
 cmake --build build-mpi --config Release
+```
+
+MPI build on Linux:
+
+```bash
+cmake -S . -B build-mpi \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DOPENPIC_ENABLE_MPI=ON
+cmake --build build-mpi -j
 ```
 
 OpenMP profiling build. Windows (`^` continues the line in cmd.exe):
@@ -153,8 +162,8 @@ faster but uses the CPU less efficiently.
 ### Build and run C++ verification tests
 
 OpenPIC has a lightweight C++ verification test executable that does not depend
-on GoogleTest or other external test frameworks. It is disabled by default and
-enable it with (same commands on Windows and Linux):
+on GoogleTest or other external test frameworks. It is disabled by default.
+Enable it with the following commands:
 
 ```text
 cmake -S . -B build-tests -DOPENPIC_BUILD_TESTS=ON
@@ -198,7 +207,7 @@ build/bin/open-pic sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM/main.lua
 
 Then inspect the resulting `diag/*.dat` files in that task's own directory
 (see [Diagnostics](#11-diagnostics)) against the expectation described for
-that case below. All 11 cases are single-process only (`verify.run()`
+that case below. All 13 cases are single-process only (`verify.run()`
 enforces this) and most complete in seconds; `ION_BEAM_RESONANT` is the
 exception (tens of thousands of steps, on the order of hours).
 
@@ -831,9 +840,9 @@ This model is simpler than a domain-decomposed MPI: no halo exchange, no particl
 
 ### When to use MPI
 
-MPI is useful when the bottleneck is particle push throughput, not memory. A run with 10 million particles and 8 MPI ranks will scatter roughly 1.25 million particles per rank per time step instead of 10 million.
-
-OpenMP alone is typically sufficient for moderate particle counts (up to ~5 million) on a single workstation. Add MPI when the run fills several hours and the node has multiple sockets or you have access to a cluster.
+MPI is useful when the bottleneck is particle push throughput, not memory
+OpenMP alone is typically sufficient for moderate particle counts (up to ~100 million) on a single workstation.
+Add MPI when the run fills several hours and the node has multiple sockets or you have access to a cluster.
 
 ### Build with MPI support
 
@@ -849,27 +858,58 @@ powershell -ExecutionPolicy Bypass -File tools\setup_msmpi.ps1
 bash tools/setup_mpi_linux.sh
 ```
 
-**CMake configuration** (same command on Windows and Linux):
+**Windows — configure and build:**
 ```text
-cmake -B build -DOPENPIC_ENABLE_MPI=ON
-cmake --build build --config Release
+cmake -S . -B build-mpi -DOPENPIC_ENABLE_MPI=ON
+cmake --build build-mpi --config Release
 ```
 
-A build without `-DOPENPIC_ENABLE_MPI=ON` behaves exactly as before and has no MPI dependency.
+The executable is generated at:
+
+```text
+build-mpi\bin\Release\open-pic_mpi.exe
+```
+
+**Linux — configure and build:**
+```bash
+cmake -S . -B build-mpi \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DOPENPIC_ENABLE_MPI=ON
+cmake --build build-mpi -j
+```
+
+The executable is generated at:
+
+```text
+build-mpi/bin/open-pic_mpi
+```
+
+A build without `-DOPENPIC_ENABLE_MPI=ON` produces the standard `open-pic` executable and has no MPI dependency.
 
 ### Running with MPI
 
+Use a production simulation case whose `main.lua` starts the simulation with:
+
+```lua
+require("sim_core").run()
+```
+
+The cases under `sim/tasks/04_VERIFICATION/` use `verification_common` and can only run in single-process mode.
+
+
 Windows:
+
 ```text
-mpiexec -n 4 build\bin\Release\open-pic.exe -mpi sim\tasks\04_VERIFICATION\UNIFORM_EQUILIBRIUM\main.lua
+mpiexec -n 4 build-mpi\bin\Release\open-pic_mpi.exe -mpi path\to\case\main.lua
 ```
 
 Linux:
+
 ```bash
-mpiexec -n 4 build/bin/open-pic -mpi sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM/main.lua
+mpiexec -n 4 ./build-mpi/bin/open-pic_mpi -mpi path/to/case/main.lua
 ```
 
-Without `-mpi` the single-process path is used regardless of how the binary was built.
+Without `-mpi`, the single-process path is used even when the MPI-enabled binary was built.
 
 Windows:
 ```text
@@ -881,17 +921,19 @@ Linux:
 build/bin/open-pic sim/tasks/04_VERIFICATION/UNIFORM_EQUILIBRIUM/main.lua
 ```
 
-The number of MPI ranks (`-n`) should not exceed the number of physical CPU cores. Each rank also spawns OpenMP threads, so the total thread count is `ranks × OMP_NUM_THREADS`. Set `OMP_NUM_THREADS` explicitly to avoid oversubscription.
+The number of MPI ranks (`-n`) should not exceed the number of physical CPU cores.
+Each rank also spawns OpenMP threads, so the total thread count is `ranks × OMP_NUM_THREADS`.
+Set `OMP_NUM_THREADS` explicitly to avoid oversubscription.
 
 Windows:
 ```text
 set OMP_NUM_THREADS=4
-mpiexec -n 4 open-pic.exe -mpi main.lua   & rem 16 threads total on a 16-core machine
+mpiexec -n 4 build-mpi\bin\Release\open-pic_mpi.exe -mpi path\to\case\main.lua   & rem 16 threads total on a 16-core machine
 ```
 
 Linux:
 ```bash
-OMP_NUM_THREADS=4 mpiexec -n 4 build/bin/open-pic -mpi main.lua   # 16 threads total on a 16-core machine
+OMP_NUM_THREADS=4 mpiexec -n 4 ./build-mpi/bin/open-pic_mpi -mpi path/to/case/main.lua   # 16 threads total on a 16-core machine
 ```
 
 ### What changes in MPI mode
@@ -945,27 +987,23 @@ The boundary-condition callbacks (`on_set_boundary_*`) are called on every rank 
 
 ## 15. Troubleshooting
 
-### `BoundaryKind` is nil in Lua
-
-The executable is older than the Lua script. Rebuild the Release executable and make sure the run script uses the freshly built binary:
-
-```text
-build\bin\Release\open-pic.exe   (Windows)
-build/bin/open-pic               (Linux)
-```
-
 ### `opic_trace.log` grows rapidly
 
-This usually means a diagnostic trace is being written for every low-density cell. Check whether `backgr_fracture` or another threshold function is logging per-cell messages. Production runs should not write per-cell trace messages.
+This usually means a diagnostic trace is being written for every low-density cell.
+Check whether `backgr_fracture` or another threshold function is logging per-cell messages.
 
 ### Edge density or velocity is wrong
 
-Check the boundary-condition order and the quantity layout. `NP` is cell-centered, while `UPx`, `UPy`, and `UPz` are face-centered. The denominator used for velocity normalization must match the face location.
+Check the boundary-condition order and the quantity layout.
+`NP` is cell-centered, while `UPx`, `UPy`, and `UPz` are face-centered.
+ The denominator used for velocity normalization must match the face location.
 
 ### Large `div(E)`
 
-The hybrid model computes `E` from Ohm's law rather than by solving a Poisson equation. Therefore the diagnostic `div(E)` is not constrained to vanish. Large or square-shaped structures in `E` or `div(E)` should be compared across cold-electron and finite-temperature cases.
+The hybrid model computes `E` from Ohm's law rather than by solving a Poisson equation.
+Therefore the diagnostic `div(E)` is not constrained to vanish.
 
 ### PSTD time step is very small
 
-PSTD has a different stability condition from FDTD. Use PSTD as a controlled numerical experiment, and keep FDTD as the reference unless the simulation series is specifically designed to compare field solvers.
+PSTD has a different stability condition from FDTD.
+Use PSTD as a controlled numerical experiment, and keep FDTD as the reference unless the simulation series is specifically designed to compare field solvers.
