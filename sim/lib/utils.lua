@@ -24,12 +24,17 @@ function M.ensure_dir(dir)
 end
 
 -- 3. Portable Bulk Copy
+-- Patterns routinely match zero files (e.g. "at*.dat" on tasks that never
+-- produce it), so the shell's per-call echo ("N file(s) copied." / "The
+-- system cannot find the file specified.") is expected noise, not a
+-- diagnostic -- callers don't check the return value. Silence it.
 function M.copy_pattern(pattern, destination)
     -- Normalize destination slashes for Windows shells
     local dest = destination
     if is_windows then dest = dest:gsub("/", "\\") end
-    
-    local cmd = string.format('%s %s %s', M.CP, pattern, dest)
+
+    local quiet = is_windows and "> nul 2>&1" or "> /dev/null 2>&1"
+    local cmd = string.format('%s %s %s %s', M.CP, pattern, dest, quiet)
     return os.execute(cmd)
 end
 

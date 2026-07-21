@@ -22,30 +22,6 @@ Key conventions:
 
 All physical quantities use CGS-Gaussian units. Normalizations are set in `main.lua` per task. Do not mix SI into new code without an explicit conversion layer.
 
-## Adding a simulation task
-
-1. Choose the correct group directory under `sim/tasks/`:
-   - `01_BASELINE/` — uniform field, reference runs
-   - `02_BG_FLOW/` — flowing background plasma
-   - `03_DIPOLE/` — dipole magnetic field geometry
-   - `SOLAR_WIND/` — background-only wind reference
-
-2. Name the directory following the naming convention:
-
-   ```
-   MA{N}_D{delta}_{FIELD}_{COLD|THERM}[_BG{M}][_modifiers]
-   ```
-
-   Use `P` for a decimal point: `D0P8` = Delta 0.8, `BG7P3` = background Ma 7.3.
-
-3. Set the Lua library path three levels up from the task directory:
-
-   ```lua
-   package.path = package.path .. ";../../../lib/?.lua"
-   ```
-
-4. Copy `run.bat` from a nearby task and adjust the executable path and script name.
-
 ## Commit messages
 
 Follow the existing log style:
