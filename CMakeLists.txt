@@ -190,6 +190,10 @@ if(OPENPIC_ENABLE_MPI)
     find_package(MPI REQUIRED)
     target_link_libraries(openpic_build_flags INTERFACE MPI::MPI_CXX)
     target_compile_definitions(openpic_build_flags INTERFACE OPENPIC_ENABLE_MPI)
+
+    # Distinguish the MPI binary from the serial one so both can coexist in
+    # the same bin/ directory without one overwriting the other.
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "${PROJECT_NAME}_mpi")
 endif()
 
 if(OPENPIC_BUILD_TESTS)
