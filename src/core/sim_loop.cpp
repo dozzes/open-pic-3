@@ -352,7 +352,7 @@ void move_particles_half_time(std::vector<DensityGrid>& density_grids,
     print_tm("move_particles_half_time: ", group_name);
     const size_t inactive_before_cleanup = particles.inactive_count();
     const size_t compacted               = particles.remove_inactives();
-    if (inactive_before_cleanup != 0 || compacted != 0) {
+    if (should_print_tm() && (inactive_before_cleanup != 0 || compacted != 0)) {
         std::cout << "  particles inactive before cleanup [" << group_name << "]: pending=" << inactive_before_cleanup
                   << " remove_inactives=" << compacted << " slots=" << particles.size() << std::endl;
     }
@@ -523,7 +523,7 @@ void move_particles_half_time(std::vector<DensityGrid>& density_grids,
     }
 
     const size_t inactive_after_move = particles.inactive_count();
-    if (inactive_after_move != inactive_before_move) {
+    if (should_print_tm() && inactive_after_move != inactive_before_move) {
         std::cout << "  particles marked inactive [" << group_name << "]: +" << (inactive_after_move - inactive_before_move)
                   << " pending=" << inactive_after_move << " slots=" << particles.size() << std::endl;
     }
