@@ -16,20 +16,6 @@
 #include <iostream>
 #include <stdexcept>
 
-namespace {
-
-// --- LUA ERROR HANDLING ---
-void check_sol_result(const sol::protected_function_result& result, const char* filename)
-{
-    if (!result.valid()) {
-        sol::error err = result;
-        std::cerr << "\nLua Error in \"" << filename << "\":\n" << err.what() << std::endl;
-        throw std::runtime_error("Lua script execution failed.");
-    }
-}
-
-} // unnamed namespace
-
 // --- THERMAL INITIALIZATION ---
 void init_thermal_from_lua(Grid& grid, sol::state& lua)
 {

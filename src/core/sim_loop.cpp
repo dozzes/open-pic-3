@@ -554,7 +554,7 @@ void move_particles_half_time(std::vector<DensityGrid>& density_grids,
         throw std::domain_error("Error occurred during the simulation!\nSee opic_thread_*_err.log files for details.");
 }
 
-void move_particles_full_time(const Grid& grid, Particles& particles, const std::string& group_name) // step m+1
+void move_particles_full_time([[maybe_unused]] const Grid& grid, Particles& particles, const std::string& group_name) // step m+1
 {
     print_tm("move_particles_full_time: ", group_name);
 

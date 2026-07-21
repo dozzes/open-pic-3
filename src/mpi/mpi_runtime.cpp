@@ -51,7 +51,7 @@ template <class GridT> void unpack_density(GridT& grid, const std::vector<double
     }
 }
 
-template <class GridT> void allreduce_density(GridT& grid)
+template <class GridT> void allreduce_density([[maybe_unused]] GridT& grid)
 {
     if (!g_enabled || g_size == 1)
         return;
@@ -103,7 +103,7 @@ void finalize()
 #endif
 }
 
-void abort(int error_code)
+void abort([[maybe_unused]] int error_code)
 {
 #ifdef OPENPIC_ENABLE_MPI
     if (g_enabled)
